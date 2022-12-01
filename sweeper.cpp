@@ -1,22 +1,38 @@
 #include "raylib.h"
 #include <string>
-#include <map>
+#include <cstdlib>
 
 class Board
 {
     public:
-        int mines[20][20][3];
+        int mines[30][16][3];
         Board(int boardWidth, int boardHeigth, int numberOfMines) {
-            int numOfMines = numberOfMines;
-            for (int i = 0; i < 20; i++) {
-                for (int j = 0; j < 20; j++) {
-                    if (numOfMines > 0 && i < boardHeigth && j < boardWidth) {
+
+            // pick random mine locations
+            int tempMineCnt = 0;
+            int tempMineLoc = 0;
+            int maxMines = numberOfMines;
+            int mineLocations[99]{};
+            int cellCnt = 0;
+
+            while (tempMineCnt < maxMines) {
+                tempMineLoc = rand() % (boardHeigth * boardWidth);
+                if (mineLocations[tempMineLoc] != 1) {
+                    mineLocations[tempMineLoc] = 1;
+                    tempMineCnt++;
+                }
+            }
+
+            for (int i = 0; i < 30; i++) {
+                for (int j = 0; j < 16; j++) {
+                    if (mineLocations[cellCnt] == 1 && i < boardHeigth && j < boardWidth) {
                         mines[i][j][0] = 0;
                         mines[i][j][1] = 1;
-                        numOfMines--;
-                    } else if (numOfMines <= 0 && i < boardHeigth && j < boardWidth) {
+                        cellCnt++;
+                    } else if (i < boardHeigth && j < boardWidth) {
                         mines[i][j][0] = 0;
                         mines[i][j][1] = 0;
+                        cellCnt++;
                     } else {
                         mines[i][j][0] = 3;
                         mines[i][j][1] = 0;
@@ -39,9 +55,9 @@ int main(int argc, char const *argv[])
     float runningTime = 0.0;
 
     // board
-    int boardWidth = 10;
-    int boardHeight = 10;
-    int numberOfMines = 40;
+    int boardWidth = 9;
+    int boardHeight = 9;
+    int numberOfMines = 10;
     Board board{boardWidth, boardHeight, numberOfMines};
 
     SetTargetFPS(60);
