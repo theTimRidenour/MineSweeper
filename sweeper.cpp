@@ -124,6 +124,8 @@ int main(int argc, char const *argv[])
     int boxHeight = 40;
     int fontSize = 32;
     bool gameOver = false;
+    int mineFlags = numberOfMines;
+    char flagText[30];
 
     // mouse
     int mouseX = GetMouseX();
@@ -167,10 +169,12 @@ int main(int argc, char const *argv[])
                                     board = checkSuroundingBlocks(i, j, boardWidth-1, boardHeight-1, board);
                                 }
                             } else if (IsMouseButtonPressed(1) && (board.mines[i][j][0] == 0 || board.mines[i][j][0] == 3)) {
-                                if (board.mines[i][j][0] == 0) {
+                                if (board.mines[i][j][0] == 0 && mineFlags > 0) {
                                     board.mines[i][j][0] = 3;
-                                } else { 
+                                    mineFlags--;
+                                } else if (board.mines[i][j][0] == 3) { 
                                     board.mines[i][j][0] = 0;
+                                    mineFlags++;
                                 }
                             }
                         }
@@ -197,6 +201,11 @@ int main(int argc, char const *argv[])
                 }
             }
         }
+
+        // draw flag counter
+        std::sprintf(flagText, "Mines: %d", mineFlags);
+        DrawText(flagText, WIN_WIDTH - 200, 20, 32, BLACK);
+
         EndDrawing();
     }
     CloseWindow();
