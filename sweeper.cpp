@@ -102,6 +102,8 @@ class Board
         }
 };
 
+Board checkSuroundingBlocks(int, int, int, int, Board);
+
 int main(int argc, char const *argv[])
 {
     // initialize window
@@ -161,6 +163,9 @@ int main(int argc, char const *argv[])
                             if (IsMouseButtonPressed(0) && board.mines[i][j][0] == 0) {
                                 board.mines[i][j][0] = 1;
                                 if (board.mines[i][j][1] == 1) { gameOver = true; }
+                                if (board.mines[i][j][2] == 0 && board.mines[i][j][1] != 1) {
+                                    board = checkSuroundingBlocks(i, j, boardWidth-1, boardHeight-1, board);
+                                }
                             } else if (IsMouseButtonPressed(1) && (board.mines[i][j][0] == 0 || board.mines[i][j][0] == 3)) {
                                 if (board.mines[i][j][0] == 0) {
                                     board.mines[i][j][0] = 3;
@@ -172,7 +177,6 @@ int main(int argc, char const *argv[])
                 }
             }
         }
-
         for (int i = 0; i < boardHeight; i++){
             for (int j = 0; j < boardWidth; j++) {
                 if (board.mines[i][j][0] != 4) {
@@ -196,4 +200,260 @@ int main(int argc, char const *argv[])
         EndDrawing();
     }
     CloseWindow();
+}
+
+Board checkSuroundingBlocks(int i, int j, int boardWidth, int boardHeight, Board board) {
+    if (board.mines[i][j][1] == 0 && board.mines[i][j][2] == 0) {
+        if (i == 0 && j == 0) {
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j+1][0] == 0) {
+                board.mines[i+1][j+1][0] = 1;
+                if (board.mines[i+1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i == 0 && j > 0 && j < boardWidth) {
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j+1][0] == 0) {
+                board.mines[i+1][j+1][0] = 1;
+                if (board.mines[i+1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j-1][0] == 0) {
+                board.mines[i+1][j-1][0] = 1;
+                if (board.mines[i+1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i == 0 && j == boardWidth) {
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j-1][0] == 0) {
+                board.mines[i+1][j-1][0] = 1;
+                if (board.mines[i+1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i > 0 && i < boardHeight && j == 0) {
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j+1][0] == 0) {
+                board.mines[i-1][j+1][0] = 1;
+                if (board.mines[i-1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j+1][0] == 0) {
+                board.mines[i+1][j+1][0] = 1;
+                if (board.mines[i+1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i > 0 && i < boardHeight && j > 0 && j < boardWidth) {
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j-1][0] == 0) {
+                board.mines[i-1][j-1][0] = 1;
+                if (board.mines[i-1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j+1][0] == 0) {
+                board.mines[i-1][j+1][0] = 1;
+                if (board.mines[i-1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j+1][0] == 0) {
+                board.mines[i+1][j+1][0] = 1;
+                if (board.mines[i+1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j-1][0] == 0) {
+                board.mines[i+1][j-1][0] = 1;
+                if (board.mines[i+1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i > 0 && i < boardHeight && j == boardWidth) {
+            if (board.mines[i+1][j][0] == 0) {
+                board.mines[i+1][j][0] = 1;
+                if (board.mines[i+1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i+1][j-1][0] == 0) {
+                board.mines[i+1][j-1][0] = 1;
+                if (board.mines[i+1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i+1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j-1][0] == 0) {
+                board.mines[i-1][j-1][0] = 1;
+                if (board.mines[i-1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i == boardHeight && j == 0) {
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j+1][0] == 0) {
+                board.mines[i-1][j+1][0] = 1;
+                if (board.mines[i-1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i == boardHeight && j > 0 && j < boardWidth) {
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j-1][0] == 0) {
+                board.mines[i-1][j-1][0] = 1;
+                if (board.mines[i-1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j+1][0] == 0) {
+                board.mines[i-1][j+1][0] = 1;
+                if (board.mines[i-1][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j+1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i][j+1][0] == 0) {
+                board.mines[i][j+1][0] = 1;
+                if (board.mines[i][j+1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j+1, boardWidth, boardHeight, board);
+                }
+            }
+        } else if (i == boardHeight && j == boardWidth) {
+            if (board.mines[i][j-1][0] == 0) {
+                board.mines[i][j-1][0] = 1;
+                if (board.mines[i][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j-1][0] == 0) {
+                board.mines[i-1][j-1][0] = 1;
+                if (board.mines[i-1][j-1][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j-1, boardWidth, boardHeight, board);
+                }
+            }
+            if (board.mines[i-1][j][0] == 0) {
+                board.mines[i-1][j][0] = 1;
+                if (board.mines[i-1][j][2] == 0) {
+                    board = checkSuroundingBlocks(i-1, j, boardWidth, boardHeight, board);
+                }
+            }
+        }
+    }
+    return board;
 }
