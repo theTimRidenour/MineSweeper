@@ -5,14 +5,14 @@
 class Board
 {
     public:
-        int mines[30][16][3];
+        int mines[16][30][3];
         Board(int boardWidth, int boardHeigth, int numberOfMines) {
 
             // pick random mine locations
             int tempMineCnt = 0;
             int tempMineLoc = 0;
             int maxMines = numberOfMines;
-            int mineLocations[99]{};
+            int mineLocations[boardHeigth*boardWidth]{};
             int cellCnt = 0;
 
             while (tempMineCnt < maxMines) {
@@ -23,8 +23,9 @@ class Board
                 }
             }
 
-            for (int i = 0; i < 30; i++) {
-                for (int j = 0; j < 16; j++) {
+            // place mines on board
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 30; j++) {
                     if (mineLocations[cellCnt] == 1 && i < boardHeigth && j < boardWidth) {
                         mines[i][j][0] = 0;
                         mines[i][j][1] = 1;
@@ -38,6 +39,64 @@ class Board
                         mines[i][j][1] = 0;
                     }
                     mines[i][j][2] = 0;
+                }
+            }
+
+            // add number of mines near location
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 30; j++) {
+                    if (mines[i][j][0] != 3) {
+                        if (i == 0 && j == 0) {
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                        } else if (i == 0 && j < boardWidth-1 && j > 0) {
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                        } else if (i == 0 && j == boardWidth-1) {
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                        } else if (i > 0 && i < boardHeigth-1 && j == 0) {
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                        } else if (i > 0 && i < boardHeigth-1 && j > 0 && j < boardWidth-1) {
+                            if (mines[i-1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j+1][1] == 1) { mines[i][j][2]++; }
+                        } else if (i > 0 && i < boardHeigth-1 && j == boardWidth-1) {
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i+1][j][1] == 1) { mines[i][j][2]++; }
+                        } else if (i == boardHeigth-1 && j == 0) {
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                        } else if (i == boardHeigth-1 && j > 0 && j < boardWidth-1) {
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j+1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i][j+1][1] == 1) { mines[i][j][2]++; }
+                        } else if (i == boardHeigth-1 && j == boardWidth-1) {
+                            if (mines[i][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j-1][1] == 1) { mines[i][j][2]++; }
+                            if (mines[i-1][j][1] == 1) { mines[i][j][2]++; }
+                        }
+                    }
                 }
             }
         }
@@ -55,9 +114,9 @@ int main(int argc, char const *argv[])
     float runningTime = 0.0;
 
     // board
-    int boardWidth = 9;
-    int boardHeight = 9;
-    int numberOfMines = 10;
+    int boardWidth = 30;
+    int boardHeight = 16;
+    int numberOfMines = 99;
     Board board{boardWidth, boardHeight, numberOfMines};
 
     SetTargetFPS(60);
@@ -71,14 +130,14 @@ int main(int argc, char const *argv[])
         ClearBackground(WHITE);
 
         // draw board text test
-        int tempWidth = 100;
-        int tempHeight = 30;
+        int tempWidth = 45;
+        int tempHeight = 15;
         char tempText[10];
-        for (int i = 0; i < 20; i++){
-            for (int j = 0; j < 20; j++) {
+        for (int i = 0; i < 16; i++){
+            for (int j = 0; j < 30; j++) {
                 if (board.mines[i][j][0] != 3) {
                     std::sprintf(tempText, "(%d, %d, %d)", board.mines[i][j][0], board.mines[i][j][1], board.mines[i][j][2]);
-                    DrawText(tempText, 10 + j * tempWidth, 10 + i * tempHeight, 20, BLACK);
+                    DrawText(tempText, 10 + j * tempWidth, 10 + i * tempHeight, 10, BLACK);
                 }
             }
         }
