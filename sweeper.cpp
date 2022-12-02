@@ -7,7 +7,10 @@ class Board
     public:
         int mines[16][30][3];
         Board(int boardWidth, int boardHeigth, int numberOfMines) {
+            newBoard(boardWidth, boardHeigth, numberOfMines);
+        }
 
+        void newBoard(int boardWidth, int boardHeigth, int numberOfMines) {
             // pick random mine locations
             int tempMineCnt = 0;
             int tempMineLoc = 0;
@@ -114,6 +117,7 @@ int main(int argc, char const *argv[])
     // universal timer
     float gameTime = 0;
     bool playing = false;
+    bool timerIsRunning = false;
     int hours = 0;
     int minutes = 0;
     int seconds = 0;
@@ -123,7 +127,7 @@ int main(int argc, char const *argv[])
     int boardWidth = 16;
     int boardHeight = 16;
     int numberOfMines = 40;
-    Board board{boardWidth, boardHeight, numberOfMines};
+    Board board(boardWidth, boardHeight, numberOfMines);
     int boxWidth = 40;
     int boxHeight = 40;
     int fontSize = 32;
@@ -138,15 +142,20 @@ int main(int argc, char const *argv[])
     SetTargetFPS(60);
     while(!WindowShouldClose())
     {
-        BeginDrawing();
-
         const float dT { GetFrameTime() };
-        if (playing) {
+
+        if (!playing) {
+            board.newBoard(boardWidth, boardHeight, numberOfMines);
+            playing = true;
+            timerIsRunning = true;
+        } else {
             gameTime += dT;
             hours = (int)(gameTime / 60 / 60);
             minutes = (int)(gameTime / 60) - (hours * 60 * 60);
             seconds = (int)(gameTime) - (minutes * 60) - (hours * 60 * 60);
         }
+
+        BeginDrawing();
 
         ClearBackground(WHITE);
 
@@ -163,7 +172,6 @@ int main(int argc, char const *argv[])
         char tempText[10];
 
         if (IsMouseButtonPressed(0) || IsMouseButtonPressed(1)) {
-            playing = true;
             mouseX = GetMouseX();
             mouseY = GetMouseY();
             for (int i = 0; i < boardHeight; i++) {
@@ -217,8 +225,71 @@ int main(int argc, char const *argv[])
         DrawText(flagText, WIN_WIDTH - 200, 20, 32, BLACK);
 
         // draw timer
-        std::sprintf(timerText, "%d:%02ld:%02ld", hours, minutes, seconds);
+        std::sprintf(timerText, "%d:%02d:%02d", hours, minutes, seconds);
         DrawText(timerText, WIN_WIDTH/2 - MeasureText(timerText, 32)/2, 20, 32, BLACK);
+
+        // draw buttons
+        mouseX = GetMouseX();
+        mouseY = GetMouseY();
+
+        int smB = MeasureText("SMALL", 32) + 20;
+        int mdB = MeasureText("MEDIUM", 32) + 20;
+        int lgB = MeasureText("LARGE", 32) + 20;
+
+        DrawRectangle(10, 6, smB, 38, DARKBLUE);
+        DrawRectangle(10 + smB + 5, 6, mdB, 38, DARKBLUE);
+        DrawRectangle(10 + smB + mdB + 10, 6, lgB, 38, DARKBLUE);
+
+        if (mouseX >= 10 && mouseX <= 20 + smB + mdB + lgB && mouseY >= 6 && mouseY <= 6 + 38) {
+            // small button interaction
+            if (mouseX >= 10 && mouseX <= 10 + smB && IsMouseButtonPressed(0)) {
+                playing = false;
+                gameTime = 0.0;
+                boardWidth = 9;
+                boardHeight = 9;
+                numberOfMines = 10;
+                mineFlags = numberOfMines;
+            } else if (mouseX >= 10 && mouseX <= 10 + smB) {
+                DrawRectangle(12, 8, smB - 4, 34, BLUE);
+                DrawText("SMALL", 20, 10, 32, DARKGRAY);
+            } else {
+                DrawText("SMALL", 20, 10, 32, BLACK);
+            }
+
+            // medium button interaction
+            if (mouseX >= 15 + smB && mouseX <= 15 + smB + mdB && IsMouseButtonPressed(0)) {
+                playing = false;
+                gameTime = 0.0;
+                boardWidth = 16;
+                boardHeight = 16;
+                numberOfMines = 40;
+                mineFlags = numberOfMines;
+            } else if (mouseX >= 15 + smB && mouseX <= 15 + smB + mdB) {
+                DrawRectangle(12 + smB + 5, 8, mdB - 4, 34, BLUE);
+                DrawText("MEDIUM", 20 + smB + 5, 10, 32, DARKGRAY);
+            } else {
+                DrawText("MEDIUM", 20 + smB + 5, 10, 32, BLACK);
+            }
+
+            // large button interaction
+            if (mouseX >= 20 + smB + mdB && mouseX <= 20 + smB + mdB + lgB && IsMouseButtonPressed(0)) {
+                playing = false;
+                gameTime = 0.0;
+                boardWidth = 30;
+                boardHeight = 16;
+                numberOfMines = 99;
+                mineFlags = numberOfMines;
+            } else if (mouseX >= 20 + smB + mdB && mouseX <= 20 + smB + mdB + lgB) {
+                DrawRectangle(12 + smB + mdB + 10, 8, lgB - 4, 34, BLUE);
+                DrawText("LARGE", 20 + smB + mdB + 10, 10, 32, DARKGRAY);
+            } else {
+                DrawText("LARGE", 20 + smB + mdB + 10, 10, 32, BLACK);
+            }
+        } else {
+            DrawText("SMALL", 20, 10, 32, BLACK);
+            DrawText("MEDIUM", 20 + smB + 5, 10, 32, BLACK);
+            DrawText("LARGE", 20 + smB + mdB + 10, 10, 32, BLACK);
+        }
 
         EndDrawing();
     }
