@@ -112,8 +112,12 @@ int main(int argc, char const *argv[])
     InitWindow(WIN_WIDTH, WIN_HEIGHT, "Mine Sweeper");
 
     // universal timer
-    const float updateTime = 1.0/60.0;
-    float runningTime = 0.0;
+    float gameTime = 0;
+    bool playing = false;
+    int hours = 0;
+    int minutes = 0;
+    int seconds = 0;
+    char timerText[20];
 
     // board
     int boardWidth = 16;
@@ -137,7 +141,12 @@ int main(int argc, char const *argv[])
         BeginDrawing();
 
         const float dT { GetFrameTime() };
-        runningTime += dT;
+        if (playing) {
+            gameTime += dT;
+            hours = (int)(gameTime / 60 / 60);
+            minutes = (int)(gameTime / 60) - (hours * 60 * 60);
+            seconds = (int)(gameTime) - (minutes * 60) - (hours * 60 * 60);
+        }
 
         ClearBackground(WHITE);
 
@@ -154,6 +163,7 @@ int main(int argc, char const *argv[])
         char tempText[10];
 
         if (IsMouseButtonPressed(0) || IsMouseButtonPressed(1)) {
+            playing = true;
             mouseX = GetMouseX();
             mouseY = GetMouseY();
             for (int i = 0; i < boardHeight; i++) {
@@ -205,6 +215,10 @@ int main(int argc, char const *argv[])
         // draw flag counter
         std::sprintf(flagText, "Mines: %d", mineFlags);
         DrawText(flagText, WIN_WIDTH - 200, 20, 32, BLACK);
+
+        // draw timer
+        std::sprintf(timerText, "%d:%02ld:%02ld", hours, minutes, seconds);
+        DrawText(timerText, WIN_WIDTH/2 - MeasureText(timerText, 32)/2, 20, 32, BLACK);
 
         EndDrawing();
     }
