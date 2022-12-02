@@ -35,7 +35,7 @@ class Board
                         mines[i][j][1] = 0;
                         cellCnt++;
                     } else {
-                        mines[i][j][0] = 3;
+                        mines[i][j][0] = 4;
                         mines[i][j][1] = 0;
                     }
                     mines[i][j][2] = 0;
@@ -126,11 +126,6 @@ int main(int argc, char const *argv[])
     // mouse
     int mouseX = GetMouseX();
     int mouseY = GetMouseY();
-    int block_l_x = 0;
-    int block_r_x = 0;
-    int block_u_y = 0;
-    int block_b_y = 0;
-        
 
     SetTargetFPS(60);
     while(!WindowShouldClose())
@@ -154,7 +149,7 @@ int main(int argc, char const *argv[])
         int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
         char tempText[10];
 
-        if (IsMouseButtonPressed(0)) {
+        if (IsMouseButtonPressed(0) || IsMouseButtonPressed(1)) {
             mouseX = GetMouseX();
             mouseY = GetMouseY();
             for (int i = 0; i < boardHeight; i++) {
@@ -162,10 +157,17 @@ int main(int argc, char const *argv[])
                     if (mouseX >= xPos + j*(boxWidth+1) &&
                         mouseX <= xPos + j*(boxWidth+1) + boxWidth &&
                         mouseY >= yPos + i*(boxHeight+1) &&
-                        mouseY <= yPos + i*(boxHeight+1) + boxHeight &&
-                        board.mines[i][j][0] == 0) {
-                            board.mines[i][j][0] = 1;
-                            if (board.mines[i][j][1] == 1) { gameOver = true; }
+                        mouseY <= yPos + i*(boxHeight+1) + boxHeight) {
+                            if (IsMouseButtonPressed(0) && board.mines[i][j][0] == 0) {
+                                board.mines[i][j][0] = 1;
+                                if (board.mines[i][j][1] == 1) { gameOver = true; }
+                            } else if (IsMouseButtonPressed(1) && (board.mines[i][j][0] == 0 || board.mines[i][j][0] == 3)) {
+                                if (board.mines[i][j][0] == 0) {
+                                    board.mines[i][j][0] = 3;
+                                } else { 
+                                    board.mines[i][j][0] = 0;
+                                }
+                            }
                         }
                 }
             }
@@ -173,7 +175,7 @@ int main(int argc, char const *argv[])
 
         for (int i = 0; i < boardHeight; i++){
             for (int j = 0; j < boardWidth; j++) {
-                if (board.mines[i][j][0] != 3) {
+                if (board.mines[i][j][0] != 4) {
                     DrawRectangle(xPos + j*(boxWidth+1), yPos + i*(boxHeight+1), boxWidth, boxHeight, BLUE);
                     if (board.mines[i][j][1] == 1 && board.mines[i][j][0] == 1) {
                         DrawRectangle(xPos + j*(boxWidth+1)+1, yPos + i*(boxHeight+1)+1, boxWidth-2, boxHeight-2, RED);
@@ -182,8 +184,11 @@ int main(int argc, char const *argv[])
                         DrawRectangle(xPos + j*(boxWidth+1)+1, yPos + i*(boxHeight+1)+1, boxWidth-2, boxHeight-2, WHITE);
                         if (board.mines[i][j][2] > 0) {
                             std::sprintf(tempText, "%d", board.mines[i][j][2]);
-                            DrawText(tempText, xPos + j*(boxWidth+1) + boxWidth/2 - MeasureText(tempText, 32)/2, yPos + i*(boxHeight+1) + boxHeight/2 - fontSize/2, fontSize, GREEN);
+                            DrawText(tempText, xPos + j*(boxWidth+1) + boxWidth/2 - MeasureText(tempText, fontSize)/2, yPos + i*(boxHeight+1) + boxHeight/2 - fontSize/2, fontSize, GREEN);
                         }
+                    }
+                    if (board.mines[i][j][0] == 3) {
+                        DrawText("Q", xPos + j*(boxWidth+1) + boxWidth/2 - MeasureText("Q", fontSize)/2, yPos + i*(boxHeight+1) + boxHeight/2 - fontSize/2, fontSize, LIGHTGRAY);
                     }
                 }
             }
