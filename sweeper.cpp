@@ -121,6 +121,15 @@ int main(int argc, char const *argv[])
     int boxWidth = 40;
     int boxHeight = 40;
     int fontSize = 32;
+    bool gameOver = false;
+
+    // mouse
+    int mouseX = GetMouseX();
+    int mouseY = GetMouseY();
+    int block_l_x = 0;
+    int block_r_x = 0;
+    int block_u_y = 0;
+    int block_b_y = 0;
         
 
     SetTargetFPS(60);
@@ -144,8 +153,26 @@ int main(int argc, char const *argv[])
         int xPos = WIN_WIDTH/2 - (boxWidth*boardWidth + boardWidth-1)/2;
         int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
         char tempText[10];
-        for (int i = 0; i < 16; i++){
-            for (int j = 0; j < 30; j++) {
+
+        if (IsMouseButtonPressed(0)) {
+            mouseX = GetMouseX();
+            mouseY = GetMouseY();
+            for (int i = 0; i < boardHeight; i++) {
+                for (int j = 0; j < boardWidth; j++) {
+                    if (mouseX >= xPos + j*(boxWidth+1) &&
+                        mouseX <= xPos + j*(boxWidth+1) + boxWidth &&
+                        mouseY >= yPos + i*(boxHeight+1) &&
+                        mouseY <= yPos + i*(boxHeight+1) + boxHeight &&
+                        board.mines[i][j][0] == 0) {
+                            board.mines[i][j][0] = 1;
+                            if (board.mines[i][j][1] == 1) { gameOver = true; }
+                        }
+                }
+            }
+        }
+
+        for (int i = 0; i < boardHeight; i++){
+            for (int j = 0; j < boardWidth; j++) {
                 if (board.mines[i][j][0] != 3) {
                     DrawRectangle(xPos + j*(boxWidth+1), yPos + i*(boxHeight+1), boxWidth, boxHeight, BLUE);
                     if (board.mines[i][j][1] == 1 && board.mines[i][j][0] == 1) {
