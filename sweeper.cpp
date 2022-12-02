@@ -114,10 +114,14 @@ int main(int argc, char const *argv[])
     float runningTime = 0.0;
 
     // board
-    int boardWidth = 30;
+    int boardWidth = 16;
     int boardHeight = 16;
-    int numberOfMines = 99;
+    int numberOfMines = 40;
     Board board{boardWidth, boardHeight, numberOfMines};
+    int boxWidth = 40;
+    int boxHeight = 40;
+    int fontSize = 32;
+        
 
     SetTargetFPS(60);
     while(!WindowShouldClose())
@@ -130,18 +134,33 @@ int main(int argc, char const *argv[])
         ClearBackground(WHITE);
 
         // draw board text test
-        int tempWidth = 45;
-        int tempHeight = 15;
+        if (boardWidth > 27) {
+            boxWidth = 40;
+            boxHeight = 40;
+        } else {
+            boxWidth = 45;
+            boxHeight = 45;
+        }
+        int xPos = WIN_WIDTH/2 - (boxWidth*boardWidth + boardWidth-1)/2;
+        int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
         char tempText[10];
         for (int i = 0; i < 16; i++){
             for (int j = 0; j < 30; j++) {
                 if (board.mines[i][j][0] != 3) {
-                    std::sprintf(tempText, "(%d, %d, %d)", board.mines[i][j][0], board.mines[i][j][1], board.mines[i][j][2]);
-                    DrawText(tempText, 10 + j * tempWidth, 10 + i * tempHeight, 10, BLACK);
+                    DrawRectangle(xPos + j*(boxWidth+1), yPos + i*(boxHeight+1), boxWidth, boxHeight, BLUE);
+                    if (board.mines[i][j][1] == 1 && board.mines[i][j][0] == 1) {
+                        DrawRectangle(xPos + j*(boxWidth+1)+1, yPos + i*(boxHeight+1)+1, boxWidth-2, boxHeight-2, RED);
+                    }
+                    if (board.mines[i][j][1] == 0 && board.mines[i][j][0] == 1) {
+                        DrawRectangle(xPos + j*(boxWidth+1)+1, yPos + i*(boxHeight+1)+1, boxWidth-2, boxHeight-2, WHITE);
+                        if (board.mines[i][j][2] > 0) {
+                            std::sprintf(tempText, "%d", board.mines[i][j][2]);
+                            DrawText(tempText, xPos + j*(boxWidth+1) + boxWidth/2 - MeasureText(tempText, 32)/2, yPos + i*(boxHeight+1) + boxHeight/2 - fontSize/2, fontSize, GREEN);
+                        }
+                    }
                 }
             }
         }
-
         EndDrawing();
     }
     CloseWindow();
