@@ -159,6 +159,13 @@ int main(int argc, char const *argv[])
             playing = true;
             timerIsRunning = true;
             gameOver = false;
+            boxWidth = (int)((WIN_WIDTH - 20 - 1 * (boardWidth-1)) / boardWidth);
+            boxHeight = (int)((WIN_HEIGHT - 70 - 1 * (boardHeight-1)) / boardHeight);
+            if (boxWidth < boxHeight) {
+                boxHeight = boxWidth;
+            } else {
+                boxWidth = boxHeight;
+            }
         } else if (timerIsRunning) {
             gameTime += dT;
             hours = (int)(gameTime / 60 / 60);
@@ -171,13 +178,6 @@ int main(int argc, char const *argv[])
         ClearBackground(WHITE);
 
         // draw board text test
-        if (boardWidth > 27) {
-            boxWidth = 40;
-            boxHeight = 40;
-        } else {
-            boxWidth = 45;
-            boxHeight = 45;
-        }
         int xPos = WIN_WIDTH/2 - (boxWidth*boardWidth + boardWidth-1)/2;
         int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
         char tempText[10];
