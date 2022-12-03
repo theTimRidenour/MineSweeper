@@ -144,11 +144,22 @@ int main(int argc, char const *argv[])
     {
         const float dT { GetFrameTime() };
 
+        if (gameOver) {
+            for (int i = 0; i < boardHeight; i++) {
+                for (int j = 0; j < boardWidth; j++) {
+                    if (board.mines[i][j][0] != 4 && board.mines[i][j][1] == 1) {
+                        board.mines[i][j][0] = 1;
+                    }
+                }
+            }
+        }
+
         if (!playing) {
             board.newBoard(boardWidth, boardHeight, numberOfMines);
             playing = true;
             timerIsRunning = true;
-        } else {
+            gameOver = false;
+        } else if (timerIsRunning) {
             gameTime += dT;
             hours = (int)(gameTime / 60 / 60);
             minutes = (int)(gameTime / 60) - (hours * 60 * 60);
@@ -171,7 +182,8 @@ int main(int argc, char const *argv[])
         int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
         char tempText[10];
 
-        if (IsMouseButtonPressed(0) || IsMouseButtonPressed(1)) {
+        // interaction with game board
+        if ((IsMouseButtonPressed(0) || IsMouseButtonPressed(1)) && timerIsRunning) {
             mouseX = GetMouseX();
             mouseY = GetMouseY();
             for (int i = 0; i < boardHeight; i++) {
@@ -182,7 +194,10 @@ int main(int argc, char const *argv[])
                         mouseY <= yPos + i*(boxHeight+1) + boxHeight) {
                             if (IsMouseButtonPressed(0) && board.mines[i][j][0] == 0) {
                                 board.mines[i][j][0] = 1;
-                                if (board.mines[i][j][1] == 1) { gameOver = true; }
+                                if (board.mines[i][j][1] == 1) {
+                                    gameOver = true;
+                                    timerIsRunning = false;
+                                }
                                 if (board.mines[i][j][2] == 0 && board.mines[i][j][1] != 1) {
                                     board = checkSuroundingBlocks(i, j, boardWidth-1, boardHeight-1, board);
                                 }
@@ -290,6 +305,9 @@ int main(int argc, char const *argv[])
             DrawText("MEDIUM", 20 + smB + 5, 10, 32, BLACK);
             DrawText("LARGE", 20 + smB + mdB + 10, 10, 32, BLACK);
         }
+
+        // GAME OVER TEXT
+        if (gameOver) { DrawText("Game Over", WIN_WIDTH/2 - MeasureText("Game Over", 60)/2, WIN_HEIGHT/2 - 30, 60, DARKGRAY); }
 
         EndDrawing();
     }
