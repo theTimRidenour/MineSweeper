@@ -132,6 +132,7 @@ int main(int argc, char const *argv[])
     int boxHeight = 40;
     int fontSize = 32;
     bool gameOver = false;
+    bool won = false;
     int mineFlags = numberOfMines;
     char flagText[30];
 
@@ -144,6 +145,28 @@ int main(int argc, char const *argv[])
     {
         const float dT { GetFrameTime() };
 
+        // Check if winner
+        if (!gameOver && timerIsRunning) {
+            int wonByFlags = 0;
+            bool wonByClicks = true;
+
+            for (int i = 0; i < boardHeight; i++) {
+                for (int j = 0; j < boardWidth; j++) {
+                    if (board.mines[i][j][0] == 0 && board.mines[i][j][1] == 0) {
+                        wonByClicks = false;
+                    } else if (board.mines[i][j][0] == 3 && board.mines[i][j][1] == 1) {
+                        wonByFlags++;
+                    }
+                }
+            }
+
+            if (wonByClicks || wonByFlags == numberOfMines) {
+                timerIsRunning = false;
+                won = true;
+            }
+        }
+
+        // GAME OVER
         if (gameOver) {
             for (int i = 0; i < boardHeight; i++) {
                 for (int j = 0; j < boardWidth; j++) {
@@ -159,6 +182,7 @@ int main(int argc, char const *argv[])
             playing = true;
             timerIsRunning = true;
             gameOver = false;
+            won = false;
             boxWidth = (int)((WIN_WIDTH - 20 - 1 * (boardWidth-1)) / boardWidth);
             boxHeight = (int)((WIN_HEIGHT - 70 - 1 * (boardHeight-1)) / boardHeight);
             if (boxWidth < boxHeight) {
@@ -308,6 +332,12 @@ int main(int argc, char const *argv[])
 
         // GAME OVER TEXT
         if (gameOver) { DrawText("Game Over", WIN_WIDTH/2 - MeasureText("Game Over", 60)/2, WIN_HEIGHT/2 - 30, 60, DARKGRAY); }
+
+        // WINNER TEXT
+        if (won) {
+            DrawRectangle(WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2 - 10, WIN_HEIGHT/2 - 40, MeasureText("WINNER!!!", 60) + 20, 80, BLACK);
+            DrawText("WINNER!!!", WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2, WIN_HEIGHT/2 -30, 60, GREEN);
+            }
 
         EndDrawing();
     }
