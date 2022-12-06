@@ -2,6 +2,8 @@
 #include <string>
 #include <cstdlib>
 
+#define MAX_INPUT_CHARS 3
+
 class Board
 {
     public:
@@ -105,6 +107,11 @@ class Board
         }
 };
 
+struct player {
+    char initials[3];
+    int time[3];
+};
+
 Board checkSuroundingBlocks(int, int, int, int, Board);
 
 int main(int argc, char const *argv[])
@@ -123,6 +130,18 @@ int main(int argc, char const *argv[])
     int seconds = 0;
     char timerText[20];
 
+    // top players
+    player leaderBoards[10][3];
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                leaderBoards[i][j].initials[k] = '@';
+                leaderBoards[i][j].time[k] = 99;
+            }
+        }
+    }
+    bool addPlayerScore = false;
+
     // board
     int boardWidth = 16;
     int boardHeight = 16;
@@ -139,6 +158,11 @@ int main(int argc, char const *argv[])
     // mouse
     int mouseX = GetMouseX();
     int mouseY = GetMouseY();
+
+    // testing text input
+    char name[MAX_INPUT_CHARS + 1] = "\0";
+    int letterCount = 0;
+    Rectangle textBox = {WIN_WIDTH/2 - 75, 180, 150, 50};
 
     SetTargetFPS(60);
     while(!WindowShouldClose())
@@ -183,6 +207,10 @@ int main(int argc, char const *argv[])
             timerIsRunning = true;
             gameOver = false;
             won = false;
+            letterCount = 0;
+            name[0] = '\0';
+            name[1] = '\0';
+            name[2] = '\0';
             boxWidth = (int)((WIN_WIDTH - 20 - 1 * (boardWidth-1)) / boardWidth);
             boxHeight = (int)((WIN_HEIGHT - 70 - 1 * (boardHeight-1)) / boardHeight);
             if (boxWidth < boxHeight) {
@@ -201,9 +229,11 @@ int main(int argc, char const *argv[])
 
         ClearBackground(WHITE);
 
-        // draw board text test
+        // player area x and y
         int xPos = WIN_WIDTH/2 - (boxWidth*boardWidth + boardWidth-1)/2;
         int yPos = WIN_HEIGHT/2 + 30 - (boxHeight*boardHeight + boardHeight-1)/2;
+
+        // temp text
         char tempText[10];
 
         // interaction with game board
@@ -331,13 +361,89 @@ int main(int argc, char const *argv[])
         }
 
         // GAME OVER TEXT
-        if (gameOver) { DrawText("Game Over", WIN_WIDTH/2 - MeasureText("Game Over", 60)/2, WIN_HEIGHT/2 - 30, 60, DARKGRAY); }
+        if (gameOver) DrawText("Game Over", WIN_WIDTH/2 - MeasureText("Game Over", 60)/2, WIN_HEIGHT/2 - 30, 60, DARKGRAY);
 
-        // WINNER TEXT
+        // WINNER
         if (won) {
-            DrawRectangle(WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2 - 10, WIN_HEIGHT/2 - 40, MeasureText("WINNER!!!", 60) + 20, 80, BLACK);
-            DrawText("WINNER!!!", WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2, WIN_HEIGHT/2 -30, 60, GREEN);
+            if (letterCount == MAX_INPUT_CHARS) {
+
+                int difficulty;
+                    if (boardWidth == 9) difficulty = 0;
+                    else if (boardWidth == 16) difficulty = 1;
+                    else difficulty = 2;
+                    
+                if (name[0] == '@') {
+                    for (int i = 0; i < 10; i++) {
+                        int spacer = MeasureText("10. MMM - 00:00:00", 60);
+                        spacer = WIN_WIDTH/2 - spacer/2;
+                        char currentText[20]{};
+                        std::sprintf(currentText, "%d.", i+1);
+                        DrawText(currentText, spacer + 65 - MeasureText(currentText, 60), 180 + i*45, 60, RED);
+                        if (leaderBoards[i][difficulty].initials[0] != '@') {
+                            std::sprintf(currentText, "%C%C%C", leaderBoards[i][difficulty].initials[0], leaderBoards[i][difficulty].initials[1], leaderBoards[i][difficulty].initials[2]);
+                            DrawText(currentText, spacer + 75, 180 + i*45, 60, RED);
+                            std::sprintf(currentText, "- %02d:%02d:%02d", leaderBoards[i][difficulty].time[0], leaderBoards[i][difficulty].time[1], leaderBoards[i][difficulty].time[2]);
+                            DrawText(currentText, spacer + 225, 180 + i*45, 60, RED);
+                        }
+                    }
+                } else {
+                    int place = 0;
+                    bool cont = true;
+                    for (int i = 0; i < 10; i++) {
+                        if (cont && (leaderBoards[i][difficulty].initials[0] == '@' || (leaderBoards[i][difficulty].time[0] >= hours &&
+                            leaderBoards[i][difficulty].time[1] >= minutes && leaderBoards[i][difficulty].time[2] >= seconds))) {
+                                addPlayerScore = true;
+                                place = i;
+                                cont = false;
+                        }
+                    }
+                    if (addPlayerScore) {
+                        for (int i = 8; i >= place; i--) {
+                            leaderBoards[i+1][difficulty].initials[0] = leaderBoards[i][difficulty].initials[0];
+                            leaderBoards[i+1][difficulty].initials[1] = leaderBoards[i][difficulty].initials[1];
+                            leaderBoards[i+1][difficulty].initials[2] = leaderBoards[i][difficulty].initials[2];
+                            leaderBoards[i+1][difficulty].time[0] = leaderBoards[i][difficulty].time[0];
+                            leaderBoards[i+1][difficulty].time[1] = leaderBoards[i][difficulty].time[1];
+                            leaderBoards[i+1][difficulty].time[2] = leaderBoards[i][difficulty].time[2];
+                        }
+                        leaderBoards[place][difficulty].initials[0] = name[0];
+                        leaderBoards[place][difficulty].initials[1] = name[1];
+                        leaderBoards[place][difficulty].initials[2] = name[2];
+                        leaderBoards[place][difficulty].time[0] = hours;
+                        leaderBoards[place][difficulty].time[1] = minutes;
+                        leaderBoards[place][difficulty].time[2] = seconds;
+                    }
+                    addPlayerScore = false;
+                }
+                name[0] = '@';
+            } else {
+                DrawRectangle(WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2 - 10, WIN_HEIGHT/2 - 40, MeasureText("WINNER!!!", 60) + 20, 80, BLACK);
+                DrawText("WINNER!!!", WIN_WIDTH/2 - MeasureText("WINNER!!!", 60)/2, WIN_HEIGHT/2 -30, 60, GREEN);
+
+                int key = GetCharPressed();
+                while (key > 0) {
+                    if ((key >= 32) && (key <= 125) && (letterCount < MAX_INPUT_CHARS)) {
+                        name[letterCount] = (char)key;
+                        name[letterCount+1] = '\0';
+                        letterCount++;
+                    }
+                    key = GetCharPressed();
+                }
+
+                if (IsKeyPressed(KEY_BACKSPACE)) {
+                    letterCount--;
+                    if (letterCount < 0) letterCount = 0;
+                    name[letterCount] = '\0';
+                }
+
+                DrawText("INITIALS", textBox.x - 150, textBox.y + 10, 32, GRAY);
+
+                DrawRectangleRec(textBox, LIGHTGRAY);
+                DrawRectangleLines((int)textBox.x, (int)textBox.y, (int)textBox.width, (int)textBox.height, MAROON);
+
+                DrawText(name, (int)textBox.x + 5, (int)textBox.y + 8, 40, MAROON);
             }
+        }
 
         EndDrawing();
     }
